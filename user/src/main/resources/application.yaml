@@ -1,0 +1,32 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/imobiliaria}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8180/realms/imobiliaria/protocol/openid-connect/certs}
+
+keycloak:
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8180}
+  realm: ${KEYCLOAK_REALM:imobiliaria}
+  client-id: ${KEYCLOAK_CLIENT_ID:admin-cli}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:}
+  user-client-id: ${KEYCLOAK_USER_CLIENT_ID:imobiliaria}
+  user-client-secret: ${KEYCLOAK_USER_CLIENT_SECRET:}
+  grant-type: ${KEYCLOAK_GRANT_TYPE:password}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
