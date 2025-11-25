@@ -27,6 +27,12 @@ spring:
           issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/imobiliaria}
           jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:http://localhost:8180/realms/imobiliaria/protocol/openid-connect/certs}
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
 eureka:
   client:
     service-url:

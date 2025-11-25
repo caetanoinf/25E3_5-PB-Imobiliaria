@@ -21,6 +21,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: imobiliaria-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - imobiliaria-network
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   # Keycloak
   keycloak:
     image: quay.io/keycloak/keycloak:26.4.2
@@ -95,12 +113,18 @@ services:
       KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8180
       KEYCLOAK_ISSUER_URI: http://keycloak:8180/realms/imobiliaria
       KEYCLOAK_JWK_SET_URI: http://keycloak:8180/realms/imobiliaria/protocol/openid-connect/certs
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
     ports:
       - "8081:8081"
     depends_on:
       eureka-server:
         condition: service_healthy
       keycloak:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     networks:
       - imobiliaria-network
@@ -120,6 +144,10 @@ services:
       SPRING_DATASOURCE_PASSWORD: admin123
       KEYCLOAK_ISSUER_URI: http://keycloak:8180/realms/imobiliaria
       KEYCLOAK_JWK_SET_URI: http://keycloak:8180/realms/imobiliaria/protocol/openid-connect/certs
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
     ports:
       - "8082:8082"
     depends_on:
@@ -128,6 +156,8 @@ services:
       postgres:
         condition: service_healthy
       keycloak:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     networks:
       - imobiliaria-network

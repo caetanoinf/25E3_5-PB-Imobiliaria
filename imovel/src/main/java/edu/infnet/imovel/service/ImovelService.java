@@ -4,6 +4,7 @@ import edu.infnet.imovel.dto.ImovelCreateDto;
 import edu.infnet.imovel.dto.ImovelFilter;
 import edu.infnet.imovel.mapper.ImovelMapper;
 import edu.infnet.imovel.exception.ImovelNotFoundException;
+import edu.infnet.imovel.messaging.ImovelEventPublisher;
 import edu.infnet.imovel.model.Imovel;
 import edu.infnet.imovel.repository.ImovelRepository;
 import edu.infnet.imovel.repository.ImovelSpecifications;
@@ -29,6 +30,7 @@ public class ImovelService {
     private final ImovelRepository imovelRepository;
     private final EntityManager entityManager;
     private final ImovelMapper imovelMapper;
+    private final ImovelEventPublisher eventPublisher;
 
     public Page<Imovel> findAll(Pageable pageable) {
         return imovelRepository.findAll(pageable);
@@ -40,7 +42,12 @@ public class ImovelService {
 
     public Imovel create(ImovelCreateDto imovelDto) {
         Imovel imovel = imovelMapper.toEntity(imovelDto);
-        return imovelRepository.save(imovel);
+        Imovel imovelSalvo = imovelRepository.save(imovel);
+
+        // Publicar evento de imóvel criado
+        eventPublisher.publicarImovelCriado(imovelSalvo);
+
+        return imovelSalvo;
     }
 
     public List<Imovel> search(ImovelFilter filter) {
